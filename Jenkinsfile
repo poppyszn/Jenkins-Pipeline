@@ -6,10 +6,18 @@ pipeline {
     jdk "JDK17"
   }
 
+  environment {
+    registryCredential = credentials('AWS_CREDENTIAL_ID')
+    imageName = "${env.ECR_IMAGE_NAME}"
+    vprofileRegistry = "${env.ECR_REGISTRY}"
+    cluster = "${env.ECS_CLUSTER}"
+    service = "${env.ECS_SERVICE}"
+  }
+
   stages {
     stage('Fetch code') {
       steps {
-        git branch: 'atom', url: 'https://github.com/example/repository.git'
+        git branch: 'docker', url: 'https://github.com/example/repository.git'
       }
     }
 
@@ -63,23 +71,30 @@ pipeline {
       }
     }
 
-    stage("Upload Artifact") {
+    stage('Build App Image') {
       steps {
-        nexusArtifactUploader(
-          nexusVersion: 'nexus3',
-          protocol: 'http',
-          nexusUrl: '${env.NEXUS_URL}',
-          groupId: 'QA',
-          version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-          repository: 'vprofile-repo',
-          credentialsId: 'nexus-login',
-          artifacts: [
-            [artifactId: 'vproapp',
-             classifier: '',
-             file: 'target/vprofile-v2.war',
-             type: 'war']
-          ]
-        );
+        script {
+          dockerImage = docker.build( imageName + ":$BUILD_NUMBER", "./Docker-files/app/multistage/" )
+        }
+      }
+    }
+
+    stage('Upload App Image') {
+      steps {
+        script {
+          docker.withRegistry( vprofileRegistry, registryCredential ) {
+            dockerImage.push("$BUILD_NUMBER")
+            dockerImage.push('latest')
+          }
+        }
+      }
+    }
+
+    stage('Deploy to ECS') {
+      steps {
+        withAWS(credentials: 'AWS_CREDENTIAL_ID', region: 'us-east-2') {
+          sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+        }
       }
     }
   }

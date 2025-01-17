@@ -1,16 +1,17 @@
-# Jenkins Pipeline Repository with Artifact Upload
+# Jenkins Pipeline Repository with ECS Deployment
 
-This repository contains Jenkins pipeline files for CI/CD workflows, including artifact management using Nexus. Each branch is tailored to specific needs, with configurations for building, testing, analyzing, and uploading artifacts.
+This repository contains Jenkins pipeline files for automating CI/CD workflows, including Docker image management and ECS deployment. Each branch is tailored to specific configurations for building, testing, analyzing, and deploying applications.
 
 ## Features
 - Automated code fetching, building, and testing
 - SonarQube integration for code quality analysis
-- Nexus artifact upload for versioned builds
-- Slack notifications for build updates
+- Docker image building and registry upload
+- Deployment to AWS ECS clusters
+- Slack notifications for build and deployment updates
 
 ## Branches
 - **main**: Contains the default Jenkins pipeline files.
-- **nexus-pipeline**: Jenkins pipeline configured for Nexus artifact upload.
+- **ecs-deploy-pipeline**: Jenkins pipeline configured for AWS ECS deployments.
 - **project-specific branches**: Branches for specific projects (e.g., `project-x`, `project-y`).
 
 ## How to Use
