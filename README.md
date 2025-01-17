@@ -11,7 +11,7 @@ This repository contains Jenkins pipeline files for automating CI/CD workflows. 
 ## How to Use
 1. Clone the repository:
    ```bash
-   https://github.com/poppyszn/Jenkins-Pipeline.git
+   git clone https://github.com/poppyszn/Jenkins-Pipeline.git
    ```
 2. Switch to the desired branch:
    ```bash
